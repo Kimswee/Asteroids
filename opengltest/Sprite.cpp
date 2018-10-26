@@ -67,16 +67,12 @@ void Sprite::update(float dt)
 	{
 		position.y = 10;
 		velocity.set(0, 0, 0);
-		acceleration.set(0, 0, 0);
-		force.set(0, 200, 0);
 	}
 
 	if (position.y >= 500) // setting the top boundary
 	{
 		position.y = 500;
 		velocity.set(0, 0, 0);
-		acceleration.set(0, 0, 0);
-		force.set(0, -200, 0);
 	}
 }
 
@@ -162,7 +158,7 @@ void Sprite::draw()
 
 	// apply the rotation around the center of the sprite
 	glTranslatef(centerX,centerY,0);
-	glRotatef(theta, 0,0,1);
+	glRotatef(theta, 0,0,-1);
 	glTranslatef(-centerX,-centerY,0);
 
 	/* get the texture coordinate from the sprite so we know which frame to draw */

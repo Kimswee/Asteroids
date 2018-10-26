@@ -131,6 +131,9 @@ public:
 	void mouseClicked(int button, int state, int x, int y);
 	void mouseMoved(int x, int y);
 
+	void spawnAsteroid(Vector3 position, Vector3 velocity, bool isBig = false);
+	void spawnProjectile(Vector3 position, Vector3 velocity);
+
 	/*********************************/
 	/* DATA */
 	/*********************************/
@@ -139,8 +142,9 @@ public:
 	GameStateInfo stateInfo;
 
 	// here is the sprite to draw to the screen
-	Sprite *testSprite;
-	Sprite *testSprite2;
+	Sprite* spaceShip;
+	std::vector<Sprite*> asteroids;
+	std::vector<Sprite*> projectiles;
 
 	// the background scroller
 	HorizontalScrollingBackground *bg;
@@ -155,6 +159,10 @@ public:
 	   or      spritesToUpdateForCollisions 
 	   etc....
     */
+
+	bool upPressed, downPressed, leftPressed, rightPressed;
+	float thrustMultiplier;
+	float rotationMultiplier;
 
 	/* timer's for rendering and animation/physics update */
 	Timer *renderingTimer;
