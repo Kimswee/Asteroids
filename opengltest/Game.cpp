@@ -40,23 +40,24 @@ void Game::initializeGame()
 {
 	/* this is a sprite without any animations, it is just an image */
 
-	spaceShip = new Sprite("images/ship.png");
+	spaceShip = new Sprite("images/spaceship.png");
 	spaceShip->setNumberOfAnimations(1);
-	spaceShip->setSpriteFrameSize(125, 125);
+	spaceShip->setSpriteFrameSize(60, 105);
 	spaceShip->addSpriteAnimFrame(0, 0, 0);
 	spaceShip->setPosition(450, 200);
-	spaceShip->setCenter(125 / 2, 125 / 2); // center of the sprites origin for rotation
+	spaceShip->setCenter(60 / 2, 105 / 2); // center of the sprites origin for rotation
 	spaceShip->setLayerID(3);
 	addSpriteToDrawList(spaceShip);
 
 	thrustMultiplier = 500;
-	rotationMultiplier = 45;
+	rotationMultiplier = 100;
+
 	upPressed = false;
 	downPressed = false;
 	leftPressed = false;
 	rightPressed = false;
 
-	spawnAsteroid(Vector3(10, 20, 0), Vector3(20, 20, 0));
+	spawnAsteroid(Vector3(-100, -100, 0), Vector3(20, 20, 0));
 	spawnAsteroid(Vector3(50, 50, 0), Vector3(20, 20, 0));
 	spawnAsteroid(Vector3(80, 20, 0), Vector3(20, 20, 0));
 
@@ -219,12 +220,12 @@ void Game::update()
 	spaceShip->update(updateTimer->getElapsedTimeSeconds());
 
 	if (leftPressed) {
-		//theta -= rotationMultiplier * updateTimer->getElapsedTimeSeconds();
-		theta--;
+		theta -= rotationMultiplier * updateTimer->getElapsedTimeSeconds();
+		//theta--; //same as above but not as accurate
 	}
 	else if (rightPressed) {
-		theta++;
-		//theta += rotationMultiplier * updateTimer->getElapsedTimeSeconds();
+		//theta++; //same as below but not as accurate
+		theta += rotationMultiplier * updateTimer->getElapsedTimeSeconds();
 	}
 	spaceShip->theta = theta;
 	
@@ -232,8 +233,18 @@ void Game::update()
 		asteroid->update(updateTimer->getElapsedTimeSeconds());
 	}
 
+	for (Sprite* projectile : projectiles) {
+		projectile->update(updateTimer->getElapsedTimeSeconds());
+	}
+
 	/* you should probably update all of the sprites in a list just like the drawing */
 	/* maybe two lists, one for physics updates and another for sprite animation frame update */
+	//for (Sprite * asteroid : asteroids) {
+	//	for (Sprite * projectile : projectiles) {
+	//		// Check if the asteroid collides with the projectile
+	//		// If it does, split the asteroid in half
+	//	}
+	//}
 }
 
 /* 
@@ -285,7 +296,7 @@ void Game::keyboardDown(unsigned char key, int mouseX, int mouseY)
 		{
 			Vector3 position = spaceShip->position;
 			float rTheta = spaceShip->theta * M_PI / 180;
-			spawnAsteroid(position, Vector3(sinf(rTheta), cosf(rTheta), 0) * 100);
+			spawnProjectile(position, Vector3(sinf(rTheta), cosf(rTheta), 0) * 500);
 		}
 		break;
 	case 27: // the escape key
@@ -386,10 +397,10 @@ void Game::spawnAsteroid(Vector3 position, Vector3 velocity, bool isBig)
 	//this function is to spawn an asteroid
 	Sprite* asteroid = new Sprite("images/asteroid.png");
 	asteroid->setNumberOfAnimations(1);
-	asteroid->setSpriteFrameSize(125, 125);
+	asteroid->setSpriteFrameSize(75, 75);
 	asteroid->addSpriteAnimFrame(0, 0, 0);
 	asteroid->setPosition(position.x, position.y);
-	asteroid->setCenter(125 / 2, 125 / 2); // center of the sprites origin for rotation
+	asteroid->setCenter(75 / 2, 75 / 2); // center of the sprites origin for rotation
 	asteroid->setLayerID(3);
 	asteroid->velocity = velocity;
 	asteroids.push_back(asteroid);
@@ -398,5 +409,14 @@ void Game::spawnAsteroid(Vector3 position, Vector3 velocity, bool isBig)
 
 void Game::spawnProjectile(Vector3 position, Vector3 velocity)
 {
-	//this function is to spawn a projectile
+	Sprite* projectile = new Sprite("images/projectile.png");
+	projectile->setNumberOfAnimations(1);
+	projectile->setSpriteFrameSize(50, 50);
+	projectile->addSpriteAnimFrame(0, 0, 0);
+	projectile->setPosition(position.x, position.y);
+	projectile->setCenter(50 / 2, 50 / 2); // center of the sprites origin for rotation
+	projectile->setLayerID(2);
+	projectile->velocity = velocity;
+	projectiles.push_back(projectile);
+	addSpriteToDrawList(projectile);
 }

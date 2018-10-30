@@ -63,17 +63,17 @@ void Sprite::update(float dt)
 
 	// this should be collisions here!  
 	// but for this example, just checking if we are at a particular pixel location on Y is fine....
-	if (position.y <= 10) // setting the limit at the bottom boundary
-	{
-		position.y = 10;
-		velocity.set(0, 0, 0);
-	}
+	//if (position.y <= 10) // setting the limit at the bottom boundary
+	//{
+	//	position.y = 10;
+	//	velocity.set(0, 0, 0);
+	//}
 
-	if (position.y >= 500) // setting the top boundary
-	{
-		position.y = 500;
-		velocity.set(0, 0, 0);
-	}
+	//if (position.y >= 500) // setting the top boundary
+	//{
+	//	position.y = 500;
+	//	velocity.set(0, 0, 0);
+	//}
 }
 
 
