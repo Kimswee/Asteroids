@@ -90,6 +90,12 @@ public:
 	void setCenter(float x, float y) {
 		centerX = x; centerY = y;
 	}
+
+	Vector3 getCenter()
+	{
+		Vector3 center (centerX,centerY,0.0f);
+		return center;
+	}
 	void setPosition(float x, float y) {
 		positionX = x; positionY = y;
 		position.x = x;

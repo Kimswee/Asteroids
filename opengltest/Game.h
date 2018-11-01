@@ -131,7 +131,10 @@ public:
 	void mouseClicked(int button, int state, int x, int y);
 	void mouseMoved(int x, int y);
 
+	// function to draw asteroids
 	void spawnAsteroid(Vector3 position, Vector3 velocity, bool isBig = false);
+
+	// function to draw projectiles
 	void spawnProjectile(Vector3 position, Vector3 velocity);
 
 	/*********************************/
@@ -167,4 +170,8 @@ public:
 	/* timer's for rendering and animation/physics update */
 	Timer *renderingTimer;
 	Timer *updateTimer; // for physics/collisions etc.
+
+
+	//check collision function
+	bool checkCollision(Vector3 p1, float r1, Vector3 p2, float r2);
 };

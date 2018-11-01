@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "drawPrimitives.h"
+#include <time.h>
 
 /* this is called by std::sort to sort the list based on layerID 
  *  for drawing in the proper order 
@@ -57,11 +58,28 @@ void Game::initializeGame()
 	leftPressed = false;
 	rightPressed = false;
 
-	spawnAsteroid(Vector3(-100, -100, 0), Vector3(20, 20, 0));
-	spawnAsteroid(Vector3(50, 50, 0), Vector3(20, 20, 0));
-	spawnAsteroid(Vector3(80, 20, 0), Vector3(20, 20, 0));
 
-	//testSprite = new Sprite("images/asteroid.png");
+	//for loop to spawn asteroids, iteration number will be random
+	//spawnAsteroid(Vector3(-100, -100, 0), Vector3(20, 20, 0), true);
+
+	srand(time(0));
+	//for (int i = 0 ; i < 10 ; i++)
+	//	std::cout << rand() << std::endl;
+
+	int subtractNumber = 50;
+	int randomNumber = rand() % 10;
+	for (int i = 0 ; i < randomNumber + 1 ; i++)
+	spawnAsteroid(
+		Vector3((rand() % 99) - subtractNumber, (rand() % 99) - subtractNumber, 0), 
+		Vector3((rand() % 99) - subtractNumber, (rand() % 99) - subtractNumber, 0)
+	,true);
+
+	
+
+	//spawnAsteroid(Vector3(50, 50, 0), Vector3(20, 20, 0));
+	//spawnAsteroid(Vector3(80, 20, 0), Vector3(20, 20, 0));
+
+	//testSprite = new Sprite("images/redbird.png");
 	//testSprite->setNumberOfAnimations(1);
 	//testSprite->setSpriteFrameSize(125,125);
 	//testSprite->addSpriteAnimFrame(0,0,0);
@@ -73,17 +91,6 @@ void Game::initializeGame()
 	/* add it to our list so we can draw it */
 	//this->addSpriteToDrawList(testSprite);
 
-	////sprite 2
-	//testSprite2 = new Sprite("images/ship.png");				   
-	//testSprite2->setNumberOfAnimations(1);
-	//testSprite2->setSpriteFrameSize(125, 125);
-	//testSprite2->addSpriteAnimFrame(0, 0, 0);
-	//testSprite2->setPosition(450, 200);
-	//testSprite2->setCenter(125 / 2, 125 / 2); // center of the sprites origin for rotation
-	//testSprite2->setLayerID(3);
-
-	///* add it to our list so we can draw it */
-	//this->addSpriteToDrawList(testSprite2);
 
 	///* load the background */
 	bg = new HorizontalScrollingBackground("images/space.jpg",stateInfo.windowWidth,stateInfo.windowHeight);
@@ -131,7 +138,6 @@ void Game::PreDraw()
 	std::sort(spriteListToDraw.begin(), spriteListToDraw.end(), spriteSortingFunction);
 
 }
-
 /* 
  * DrawGame()
  *  - this is the actual drawing of the current frame of the game.
@@ -142,8 +148,12 @@ void Game::DrawGame()
 	drawSprites();
 
 	glDisable(GL_TEXTURE_2D);
-	drawTestPrimitives();  
+	drawTestPrimitives();
 
+	//setColor(0.2, 0.2, 0);
+	//drawRectangle(true, 0, 0, 300, 400, 0);
+	//setColor(0, 1, 0);
+	//drawText("TEST", 100, 100);
 	/* this makes it actually show up on the screen */
 	glutSwapBuffers();
 }
@@ -208,8 +218,8 @@ void Game::update()
 	// update our clock so we have the delta time since the last update
 	updateTimer->tick();
 	float theta = spaceShip->theta;
-	float rTheta = theta * M_PI / 180;
-	Vector3 force = Vector3(sinf(rTheta), cosf(rTheta), 0) * thrustMultiplier;
+	float rTheta = theta * M_PI / 180; // converting from degrees to radians
+	Vector3 force = Vector3(sinf(rTheta), cosf(rTheta), 0) * thrustMultiplier; // sinf and cosf uses radian
 	if (!upPressed && !downPressed) {
 		force.set(0, 0, 0);
 	}
@@ -227,7 +237,7 @@ void Game::update()
 		//theta++; //same as below but not as accurate
 		theta += rotationMultiplier * updateTimer->getElapsedTimeSeconds();
 	}
-	spaceShip->theta = theta;
+	(*spaceShip).theta = theta;
 	
 	for (Sprite* asteroid : asteroids) {
 		asteroid->update(updateTimer->getElapsedTimeSeconds());
@@ -245,6 +255,37 @@ void Game::update()
 	//		// If it does, split the asteroid in half
 	//	}
 	//}
+
+	// CHECK COLLISIONS AND RESPOND TO THEM IF THEY OCCUR
+
+	for each (Sprite* projectile in projectiles) {
+		for each (Sprite* asteroid in asteroids) {
+			if (checkCollision(projectile->getCenter() + projectile->position, projectile->sz.width / 2, asteroid->getCenter() + asteroid->position, asteroid->sz.width / 2)) {
+				// if small asteroid: delete
+				// increase score
+				asteroid->setPosition(-999.0f, -999.0f);
+				projectile->setPosition(-999.0f, -999.0f);
+				// if large asteroid: split
+			}
+		}
+	}
+	{
+
+	}
+
+}
+
+//check collision function
+bool Game::checkCollision(Vector3 p1, float r1, Vector3 p2, float r2)
+{
+	float D = sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+	if (D < (r1 + r2))
+	{
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 /* 
@@ -395,12 +436,26 @@ void Game::mouseMoved(int x, int y)
 void Game::spawnAsteroid(Vector3 position, Vector3 velocity, bool isBig)
 {
 	//this function is to spawn an asteroid
-	Sprite* asteroid = new Sprite("images/asteroid.png");
+	Sprite* asteroid = new Sprite("images/asteroid2.png"); //need to delete later on = new Sprite("images/asteroid2.png");
+
 	asteroid->setNumberOfAnimations(1);
-	asteroid->setSpriteFrameSize(75, 75);
+	if (isBig)
+	{
+		//asteroid = new Sprite("images/asteroid2.png");
+
+		asteroid->setSpriteFrameSize(150, 150);
+		asteroid->setCenter(75, 75); // center of the sprites origin for rotation
+
+	}
+	else {
+		//asteroid = new Sprite("images/asteroid.png");
+
+		asteroid->setSpriteFrameSize(75, 75);
+		asteroid->setCenter(75 / 2, 75 / 2); // center of the sprites origin for rotation
+
+	}
 	asteroid->addSpriteAnimFrame(0, 0, 0);
 	asteroid->setPosition(position.x, position.y);
-	asteroid->setCenter(75 / 2, 75 / 2); // center of the sprites origin for rotation
 	asteroid->setLayerID(3);
 	asteroid->velocity = velocity;
 	asteroids.push_back(asteroid);
@@ -419,4 +474,5 @@ void Game::spawnProjectile(Vector3 position, Vector3 velocity)
 	projectile->velocity = velocity;
 	projectiles.push_back(projectile);
 	addSpriteToDrawList(projectile);
+
 }

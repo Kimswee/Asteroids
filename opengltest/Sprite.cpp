@@ -74,6 +74,9 @@ void Sprite::update(float dt)
 	//	position.y = 500;
 	//	velocity.set(0, 0, 0);
 	//}
+
+
+
 }
 
 
