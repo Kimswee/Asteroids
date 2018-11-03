@@ -237,7 +237,7 @@ void Game::update()
 		//theta++; //same as below but not as accurate
 		theta += rotationMultiplier * updateTimer->getElapsedTimeSeconds();
 	}
-	(*spaceShip).theta = theta;
+	(*spaceShip).theta = theta;  // same as spaceShip->theta = theta;
 	
 	for (Sprite* asteroid : asteroids) {
 		asteroid->update(updateTimer->getElapsedTimeSeconds());
