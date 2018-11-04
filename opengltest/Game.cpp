@@ -59,20 +59,26 @@ void Game::initializeGame()
 	rightPressed = false;
 
 
-	//for loop to spawn asteroids, iteration number will be random
+	//for loop to spawn asteroids
 	//spawnAsteroid(Vector3(-100, -100, 0), Vector3(20, 20, 0), true);
 
 	srand(time(0));
 	//for (int i = 0 ; i < 10 ; i++)
 	//	std::cout << rand() << std::endl;
 
-	int subtractNumber = 50;
+	int subtractNumber1 = 200;
+	int subtractNumber2 = 50;
 	int randomNumber = rand() % 10;
-	for (int i = 0 ; i < randomNumber + 1 ; i++)
+	for (int i = 0 ; i < 50 ; i++)
 	spawnAsteroid(
-		Vector3((rand() % 99) - subtractNumber, (rand() % 99) - subtractNumber, 0), 
-		Vector3((rand() % 99) - subtractNumber, (rand() % 99) - subtractNumber, 0)
-	,true);
+		Vector3((rand() % 99) - subtractNumber1, (rand() % 99) - subtractNumber1, 0), 
+		Vector3((rand() % 99) - subtractNumber2, (rand() % 99) - subtractNumber2, 0)
+	,false);
+
+	spawnAsteroid(
+		Vector3((rand() % 99) - subtractNumber1, (rand() % 99) - subtractNumber1, 0),
+		Vector3((rand() % 99) - subtractNumber2, (rand() % 99) - subtractNumber2, 0)
+		, false);
 
 	
 
@@ -142,6 +148,10 @@ void Game::PreDraw()
  * DrawGame()
  *  - this is the actual drawing of the current frame of the game.
  */
+
+std::string scoreText = "Score: 00";
+int score = 0;
+
 void Game::DrawGame()
 {
 	/* here is where your drawing stuff goes */
@@ -152,8 +162,12 @@ void Game::DrawGame()
 
 	//setColor(0.2, 0.2, 0);
 	//drawRectangle(true, 0, 0, 300, 400, 0);
-	//setColor(0, 1, 0);
-	//drawText("TEST", 100, 100);
+
+	setColor(1, 1, 1);
+	drawText("Shield: 0", 300, 100);
+	drawText("Lives: 3", 500, 100);
+	drawText(scoreText , 700, 100);
+
 	/* this makes it actually show up on the screen */
 	glutSwapBuffers();
 }
@@ -204,6 +218,7 @@ void Game::drawTestPrimitives()
 	}
 }
 
+
 /* update()
   - this function is essentially the game loop
     it gets called often and as such you
@@ -217,6 +232,7 @@ void Game::update()
 {
 	// update our clock so we have the delta time since the last update
 	updateTimer->tick();
+
 	float theta = spaceShip->theta;
 	float rTheta = theta * M_PI / 180; // converting from degrees to radians
 	Vector3 force = Vector3(sinf(rTheta), cosf(rTheta), 0) * thrustMultiplier; // sinf and cosf uses radian
@@ -258,13 +274,19 @@ void Game::update()
 
 	// CHECK COLLISIONS AND RESPOND TO THEM IF THEY OCCUR
 
+	// scoreText += std::to_string(score);
+
 	for each (Sprite* projectile in projectiles) {
 		for each (Sprite* asteroid in asteroids) {
 			if (checkCollision(projectile->getCenter() + projectile->position, projectile->sz.width / 2, asteroid->getCenter() + asteroid->position, asteroid->sz.width / 2)) {
 				// if small asteroid: delete
-				// increase score
-				asteroid->setPosition(-999.0f, -999.0f);
-				projectile->setPosition(-999.0f, -999.0f);
+				
+				scoreText.erase(7);// erase last 2 characters in scoreText //erase(number) = number is the number of characters to be kept
+				score += 10; // increase score
+				scoreText += std::to_string(score); // add increase in score to scoreText
+				
+				asteroid->setPosition(-999.0f, -999.0f); // send the asteroid to the nether realm
+				projectile->setPosition(-9999.0f, -9999.0f); // send the projectile to the nether realm
 				// if large asteroid: split
 			}
 		}
@@ -436,7 +458,8 @@ void Game::mouseMoved(int x, int y)
 void Game::spawnAsteroid(Vector3 position, Vector3 velocity, bool isBig)
 {
 	//this function is to spawn an asteroid
-	Sprite* asteroid = new Sprite("images/asteroid2.png"); //need to delete later on = new Sprite("images/asteroid2.png");
+	//Sprite* asteroid = new Sprite("images/asteroid.png"); //need to delete later on = new Sprite("images/asteroid2.png");
+	Sprite* asteroid = new Sprite("images/asteroid.png");
 
 	asteroid->setNumberOfAnimations(1);
 	if (isBig)
